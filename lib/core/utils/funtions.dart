@@ -5,7 +5,7 @@ Future<String> determineInitialRoute() async {
   final SharedPref sharedPref = SharedPref();
 
   final isFirstLaunch = await sharedPref.read('isFirstLaunch');
-  if (isFirstLaunch != null || isFirstLaunch != true) {
+  if (isFirstLaunch == null || isFirstLaunch == true) {
     await sharedPref.save('isFirstLaunch', false);
     return Routes.onboarding;
   }

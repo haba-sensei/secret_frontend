@@ -47,5 +47,9 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>Necesitamos tu ubicación para mostrar el mapa centrado en ti.</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+		<string>Necesitamos tu ubicación para mostrar el mapa centrado en ti.</string>
 	</dict>
 </plist>

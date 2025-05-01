@@ -53,6 +53,14 @@ class UsersController extends GetxController {
 
       if (response.session != null) {
         await _sharedPref.save('user', response.user?.toJson());
+
+        if (response.user?.userMetadata != null) {
+          final avatarUrl = response.user?.userMetadata!['avatar_url'];
+          if (avatarUrl != null) {
+            await _sharedPref.saveAvatarImage(avatarUrl);
+          }
+        }
+
         GlobalController().onInit();
         _sharedPref.checkSessionStatus();
       } else {

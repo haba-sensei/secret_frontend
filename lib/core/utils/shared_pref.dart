@@ -7,6 +7,8 @@ import 'package:tu_agenda_ya/routes/routes_names.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:typed_data';
 
 class SharedPref {
   final SupabaseClient supabase = Supabase.instance.client;
@@ -76,6 +78,30 @@ class SharedPref {
       Get.offAllNamed(Routes.login);
     } else {
       Get.offAllNamed(Routes.home);
+    }
+  }
+
+  Future<void> saveAvatarImage(String avatarUrl) async {
+    final prefs = await SharedPreferences.getInstance();
+    final response = await http.get(Uri.parse(avatarUrl));
+
+    if (response.statusCode == 200) {
+      String base64Image = base64Encode(response.bodyBytes);
+      await prefs.setString('user_avatar', base64Image);
+    } else {
+      throw Exception('No se pudo descargar la imagen de avatar');
+    }
+  }
+
+  Future<ImageProvider> getAvatarImageProvider() async {
+    final prefs = await SharedPreferences.getInstance();
+    final base64Image = prefs.getString('user_avatar');
+
+    if (base64Image != null) {
+      Uint8List bytes = base64Decode(base64Image);
+      return MemoryImage(bytes);
+    } else {
+      return const AssetImage('assets/240-1.png');
     }
   }
 }

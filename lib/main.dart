@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:tu_agenda_ya/core/constant/const_texts.dart';
 import 'package:tu_agenda_ya/core/utils/colors_style.dart';
 import 'package:tu_agenda_ya/core/utils/preloaded_assets.dart';
@@ -12,7 +11,6 @@ import 'package:tu_agenda_ya/core/utils/funtions.dart';
 void main() async {
   await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,

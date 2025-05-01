@@ -27,12 +27,17 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(
-                      user.avatarUrl.toString(),
-                    ),
-                  ),
+                  Obx(() {
+                    final avatarUrl = cntrl.userLoad.value.avatarUrl;
+
+                    return CircleAvatar(
+                      radius: 25,
+                      backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
+                          ? NetworkImage(avatarUrl)
+                          : const AssetImage('assets/240-1.png')
+                              as ImageProvider,
+                    );
+                  }),
                   const SizedBox(width: 8),
                   Flexible(
                     child: Text(
