@@ -20,7 +20,6 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
           return AppBar(
             backgroundColor: MyColors.primaryColor,
             elevation: 0,
-            centerTitle: false,
             automaticallyImplyLeading: false,
             title: Obx(() {
               final user = cntrl.userLoad.value;
@@ -60,26 +59,18 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                 icon: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    Container(
-                      width: 45,
-                      height: 45,
-                      decoration: BoxDecoration(
-                        color: MyColors.primaryColor,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.notifications,
-                        color: Colors.white,
-                        size: 30,
-                      ),
+                    const Icon(
+                      Icons.notifications,
+                      color: Colors.white,
+                      size: 35,
                     ),
                     if (notificationCount > 0)
                       Positioned(
-                        right: 0,
+                        right: -5,
                         top: 0,
                         child: Container(
                           padding: const EdgeInsets.all(2),
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: Colors.red,
                             shape: BoxShape.circle,
                           ),
@@ -103,9 +94,9 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                       ),
                   ],
                 ),
-                onPressed: () => {
-                  cntrl.updatePageIndex(9),
-                  Get.toNamed(Routes.notifications)
+                onPressed: () {
+                  cntrl.updatePageIndex(9);
+                  Get.toNamed(Routes.notifications);
                 },
               ),
               IconButton(
@@ -114,8 +105,10 @@ class CustomAppbar extends StatelessWidget implements PreferredSizeWidget {
                   color: Colors.white,
                   size: 30,
                 ),
-                onPressed: () =>
-                    {cntrl.updatePageIndex(9), Get.toNamed(Routes.settings)},
+                onPressed: () {
+                  cntrl.updatePageIndex(9);
+                  Get.toNamed(Routes.settings);
+                },
               ),
             ],
           );

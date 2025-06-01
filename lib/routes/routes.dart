@@ -4,6 +4,8 @@ import 'package:tu_agenda_ya/modules/home/views/home_page.dart';
 import 'package:tu_agenda_ya/modules/booking/views/booking_page.dart';
 import 'package:tu_agenda_ya/modules/notifications/views/notification_page.dart';
 import 'package:tu_agenda_ya/modules/payments/views/payments_page.dart';
+import 'package:tu_agenda_ya/modules/stores/views/stores_list_page.dart';
+import 'package:tu_agenda_ya/modules/stores/views/stores_map_page.dart';
 import 'package:tu_agenda_ya/modules/stores/views/stores_page.dart';
 import 'package:tu_agenda_ya/modules/users/views/login_page.dart';
 import 'package:tu_agenda_ya/modules/users/views/logout_page.dart';
@@ -37,7 +39,7 @@ class AppPages {
     GetPage<HomePage>(
       name: Routes.home,
       page: () => const HomePage(),
-      transition: Transition.noTransition,
+      transition: Transition.fadeIn,
     ),
     GetPage<BookingPage>(
       name: Routes.booking,
@@ -67,7 +69,17 @@ class AppPages {
     GetPage<FavoritosPage>(
       name: Routes.favoritos,
       page: () => const FavoritosPage(),
-      transition: Transition.noTransition,
+      transition: Transition.fadeIn,
+    ),
+    GetPage<StoresMapPage>(
+      name: Routes.storesMap,
+      page: () => const StoresMapPage(),
+      transition: Transition.fadeIn,
+    ),
+    GetPage<StoresListPage>(
+      name: Routes.storesList,
+      page: () => const StoresListPage(),
+      transition: Transition.fadeIn,
     ),
   ];
 }

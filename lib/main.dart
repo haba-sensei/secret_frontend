@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:tu_agenda_ya/core/constant/const_texts.dart';
 import 'package:tu_agenda_ya/core/utils/colors_style.dart';
 import 'package:tu_agenda_ya/core/utils/preloaded_assets.dart';
@@ -9,8 +10,16 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:tu_agenda_ya/core/utils/funtions.dart';
 
 void main() async {
-  await dotenv.load();
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent,
+    systemNavigationBarIconBrightness: Brightness.dark,
+    statusBarColor: Colors.transparent,
+    statusBarIconBrightness: Brightness.dark,
+  ));
+
+  await dotenv.load();
 
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,

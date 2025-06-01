@@ -8,5 +8,5 @@ class MyColors {
   static Color baseTextColorWhite = const Color(0xFFffffff);
   static Color baseTextColorBlack = const Color(0xFF1A1919);
   static Color baseTextColorGrey = const Color(0xB7919191);
-  static Color baseTextColorLessGrey = const Color(0x1FA8A8A8);
+  static Color baseTextColorLessGrey = const Color(0xFFA8A8A8);
 }

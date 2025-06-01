@@ -1,37 +1,37 @@
-import 'package:tu_agenda_ya/modules/home/controller/home_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:logger/logger.dart';
+import 'package:tu_agenda_ya/global/widgets/sticky_toggle_view_header.dart';
+import 'package:tu_agenda_ya/modules/home/controller/home_controller.dart';
+import 'package:tu_agenda_ya/modules/home/widgets/service_section.dart';
+import 'package:tu_agenda_ya/modules/home/widgets/slider_section.dart';
 
 class HomeLogic extends StatelessWidget {
   const HomeLogic({super.key});
 
   @override
   Widget build(BuildContext context) {
-    var logger = Logger();
-    return GetX<HomeController>(
-      init: HomeController(),
-      builder: (controller) {
-        if (controller.isLoading.value) {
-          return SafeArea(
-            child: Center(
-              child: Text('llege HOME'),
-            ),
-          );
-          // return const Center(child: CircularProgressIndicator());
-        }
+    final controller = Get.put(HomeController());
 
-        if (controller.errorMessage.isNotEmpty) {
-          logger.e("Error: ${controller.errorMessage.value}");
-          return Center(child: Text(controller.errorMessage.value));
-        }
-
-        return SafeArea(
-          child: Center(
-            child: Text('llege HOME'),
+    return SafeArea(
+      child: Obx(
+        () => SingleChildScrollView(
+          child: Column(
+            children: [
+              StickyToggleViewHeaderWidget(),
+              const SizedBox(height: 20),
+              ServicesSection(),
+              const SizedBox(height: 20),
+              ...controller.sliders.map(
+                (slider) => StoreSlider(
+                  title: slider.title,
+                  stores: slider.stores,
+                  isLoading: controller.isLoading.value,
+                ),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

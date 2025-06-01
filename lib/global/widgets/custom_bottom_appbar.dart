@@ -41,7 +41,7 @@ class CustomBottomAppbar extends StatelessWidget {
                   selectedItemIconColor: MyColors.primaryColor,
                   itemIconColor: Colors.grey[500],
                   decoration: BoxDecoration(
-                    color: MyColors.baseTextColorLessGrey,
+                    color: MyColors.baseTextColorWhite,
                   ),
                   itemIconSize: 28,
                   selectedItemIconSize: 28),
@@ -72,13 +72,13 @@ class CustomBottomAppbar extends StatelessWidget {
                 Future.delayed(const Duration(milliseconds: 300), () {
                   switch (index) {
                     case 0:
-                      Get.toNamed(Routes.home);
+                      Get.offNamed(Routes.home, preventDuplicates: true);
                       break;
                     case 1:
-                      Get.toNamed(Routes.chat);
+                      Get.toNamed(Routes.chat, preventDuplicates: true);
                       break;
                     case 2:
-                      Get.toNamed(Routes.favoritos);
+                      Get.offNamed(Routes.favoritos, preventDuplicates: true);
                       break;
                     case 3:
                       cntrl.userLogOut();

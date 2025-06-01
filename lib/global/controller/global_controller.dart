@@ -1,5 +1,6 @@
 import 'package:logger/logger.dart';
 import 'package:tu_agenda_ya/core/utils/shared_pref.dart';
+import 'package:tu_agenda_ya/global/model/store_model.dart';
 import 'package:tu_agenda_ya/modules/users/model/user_model.dart';
 import 'package:get/get.dart';
 
@@ -48,5 +49,34 @@ class GlobalController extends GetxController {
       selectedPageIndex.value = index;
       update();
     }
+  }
+
+  Future<void> toggleFavorite(StoreModel store) async {
+    final user = UserModel.fromJson(await _sharedPref.read('user') ?? {});
+    if (user.id == null) return;
+
+    final key = 'favorites_user_${user.id}';
+    List<dynamic> favorites = await _sharedPref.read(key) ?? [];
+
+    // Check si ya está en favoritos
+    final exists = favorites.any((s) => s['id'] == store.id);
+
+    if (exists) {
+      favorites.removeWhere((s) => s['id'] == store.id);
+    } else {
+      logger.i(store.toJson());
+      favorites.add(store.toJson());
+    }
+
+    await _sharedPref.save(key, favorites);
+  }
+
+  Future<bool> isFavorite(StoreModel store) async {
+    final user = UserModel.fromJson(await _sharedPref.read('user') ?? {});
+    if (user.id == null) return false;
+
+    final key = 'favorites_user_${user.id}';
+    List<dynamic> favorites = await _sharedPref.read(key) ?? [];
+    return favorites.any((s) => s['id'] == store.id);
   }
 }
