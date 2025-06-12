@@ -1,22 +1,26 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
-import 'package:location/location.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:location/location.dart';
 import 'package:logger/logger.dart';
 import 'package:tu_agenda_ya/core/utils/funtions.dart';
 import 'package:tu_agenda_ya/global/service/store_service.dart';
+import 'package:tu_agenda_ya/modules/home/controller/home_controller.dart';
 
 class StoresController extends GetxController {
+  final homeController = Get.find<HomeController>();
   var logger = Logger();
-  final Location _location = Location();
   final _storeService = StoreService();
+  final _locationService = Location();
 
   var isLoading = true.obs;
   var errorMessage = ''.obs;
 
   var userLocation = LatLng(0.0, 0.0).obs;
   var stores = <Map<String, dynamic>>[].obs;
+  var selectedStoreId = Rxn<int>();
   var polygonPoints = <LatLng>[].obs;
+  var routePoints = <LatLng>[].obs;
 
   var departamentos = <String>[].obs;
 
@@ -34,15 +38,20 @@ class StoresController extends GetxController {
   var tiposDeServicios = <Map<String, dynamic>>[].obs;
   var serviciosSeleccionados = <int>[].obs;
 
+  var detailStoreView = Rxn<Map<String, dynamic>>();
+
+  final animatedStoreIds = <int>{}.obs;
+
   final MapController mapController = MapController();
 
   @override
   Future<void> onInit() async {
     super.onInit();
-    await _getUserLocation();
+    final loc = homeController.currentLocation;
+    if (loc != null) {
+      userLocation.value = LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0);
+    }
     await cargarDepartamentosYDistritos();
-
-    // Selección por defecto Lima para departamento y provincia
     if (departamentos.contains('Lima')) {
       seleccionarDepartamento('Lima');
 
@@ -57,53 +66,65 @@ class StoresController extends GetxController {
     isLoading.value = false;
   }
 
-  Future<void> _getUserLocation() async {
-    bool serviceEnabled = await _location.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _location.requestService();
-      if (!serviceEnabled) {
-        errorMessage.value = 'Servicio de ubicación no habilitado.';
-        return;
-      }
-    }
-
-    PermissionStatus permissionGranted = await _location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        errorMessage.value = 'Permiso de ubicación denegado.';
-        return;
-      }
-    }
-
-    LocationData locationData = await _location.getLocation();
-    userLocation.value =
-        LatLng(locationData.latitude ?? 0.0, locationData.longitude ?? 0.0);
-  }
-
   Future<void> loadStoresMap({
     Map<String, double>? bounds,
     List<int>? typeStoreIds,
+    List<Map<String, double>>? coords,
   }) async {
     try {
+      final currentLocation = await _locationService.getLocation();
+      final lat0 = currentLocation.latitude!;
+      final lon0 = currentLocation.longitude!;
+
       final result = await _storeService.getStoresMap(
         bounds: bounds,
         typeStoreIds: typeStoreIds,
+        coords: coords,
       );
+
+      for (var store in result) {
+        final geo = store['geolocation'] as String?;
+        if (geo != null && geo.contains(',')) {
+          final parts = geo.split(',');
+          final lat = double.tryParse(parts[0]);
+          final lon = double.tryParse(parts[1]);
+
+          if (lat != null && lon != null) {
+            final d = calculateDistance(lat0, lon0, lat, lon);
+            store['distance'] = d;
+            store['estimatedTime'] = estimateTime(d);
+          }
+        }
+      }
+
       stores.assignAll(result);
     } catch (e) {
       errorMessage.value = 'Error al cargar negocios: $e';
     }
   }
 
+
   Future<void> centerMapOnUser() async {
-    await _getUserLocation();
-    mapController.move(userLocation.value, 15.0);
+    final loc = homeController.currentLocation;
+    if (loc != null) {
+      userLocation.value = LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0);
+      mapController.move(userLocation.value, 15.0);
+    } else {
+      errorMessage.value = 'Ubicación del usuario no disponible';
+    }
   }
 
   Future<void> clearMap() async {
-    await _getUserLocation();
-    mapController.move(userLocation.value, 10.0);
+    final loc = homeController.currentLocation;
+    if (loc != null) {
+      userLocation.value = LatLng(loc.latitude ?? 0.0, loc.longitude ?? 0.0);
+      polygonPoints.clear();
+      serviciosSeleccionados.clear();
+      stores.clear();
+      mapController.move(userLocation.value, 10.0);
+    } else {
+      errorMessage.value = 'Ubicación del usuario no disponible';
+    }
   }
 
   Future<void> cargarDepartamentosYDistritos() async {
@@ -159,7 +180,14 @@ class StoresController extends GetxController {
     polygonPoints.assignAll(coordenadas);
 
     final center = _calcularCentro(coordenadas);
-    mapController.move(center, 12);
+    mapController.move(center, 14);
+
+    final coordsJson = coordenadas
+        .map((coord) => {
+              'lat': coord.latitude,
+              'lng': coord.longitude,
+            })
+        .toList();
 
     final latitudes = coordenadas.map((p) => p.latitude);
     final longitudes = coordenadas.map((p) => p.longitude);
@@ -175,6 +203,7 @@ class StoresController extends GetxController {
         'max_lng': maxLng,
       },
       typeStoreIds: serviceIds,
+      coords: coordsJson
     );
   }
 

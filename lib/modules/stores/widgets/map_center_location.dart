@@ -22,24 +22,10 @@ class MapCenterLocation extends StatelessWidget {
         onPressed: () async {
           cntrl.centerMapOnUser();
         },
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.location_searching_rounded,
-              size: 24,
-              color: MyColors.primaryColor,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Mi ubicación',
-              style: TextStyle(
-                fontSize: 17,
-                color: MyColors.primaryColor,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
+        child: Icon(
+          Icons.location_searching_rounded,
+          size: 24,
+          color: MyColors.primaryColor,
         ),
       ),
     );

@@ -57,12 +57,14 @@ class _FilterBottomSheetState extends State<FilterBottomSheet> {
       coords.add(coords.first);
     }
 
-    await controller.aplicarFiltro(
-      coordenadas: coords,
-      serviceIds: controller.serviciosSeleccionados,
-    );
-
     Get.back();
+
+    Future.microtask(() {
+      controller.aplicarFiltro(
+        coordenadas: coords,
+        serviceIds: controller.serviciosSeleccionados,
+      );
+    });
   }
 
   @override

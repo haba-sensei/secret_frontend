@@ -47,8 +47,9 @@ class StoreService {
   Future<List<Map<String, dynamic>>> getStoresMap({
     Map<String, double>? bounds,
     List<int>? typeStoreIds,
+    List<Map<String, double>>? coords,
   }) async {
-    final response = await _supabase.rpc('get_stores_map2', params: {
+    final response = await _supabase.rpc('get_stores_map3', params: {
       if (bounds != null) ...{
         'min_lat': bounds['min_lat'],
         'max_lat': bounds['max_lat'],
@@ -56,6 +57,7 @@ class StoreService {
         'max_lng': bounds['max_lng'],
       },
       if (typeStoreIds != null) 'type_store_ids': typeStoreIds,
+      if (coords != null) '_coords': coords,
     });
     if (response == null) return [];
     return List<Map<String, dynamic>>.from(response as List);

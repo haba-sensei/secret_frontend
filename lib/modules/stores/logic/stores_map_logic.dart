@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
-import 'package:tu_agenda_ya/global/widgets/loading_spinner.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:tu_agenda_ya/modules/stores/controller/stores_controller.dart';
 import 'package:tu_agenda_ya/modules/stores/widgets/map_bottom_sheet.dart';
 import 'package:tu_agenda_ya/modules/stores/widgets/map_center_location.dart';
 import 'package:tu_agenda_ya/modules/stores/widgets/map_marker_layer.dart';
 import 'package:tu_agenda_ya/modules/stores/widgets/map_poligon_layer.dart';
+import 'package:tu_agenda_ya/modules/stores/widgets/map_store_detail.dart';
 import 'package:tu_agenda_ya/modules/stores/widgets/map_tile_layer.dart';
 
 class StoresMapLogic extends StatelessWidget {
@@ -17,23 +18,31 @@ class StoresMapLogic extends StatelessWidget {
     return GetX<StoresController>(
       init: StoresController(),
       builder: (cntrl) {
-        if (cntrl.isLoading.value) {
-          return const LoadingSpinnger();
+        final LatLng location = cntrl.userLocation.value;
+
+        final bool locationReady =
+            location.latitude != 0.0 && location.longitude != 0.0;
+
+        if (!locationReady) {
+          return const SizedBox.shrink();
         }
+
         return Stack(
           children: [
             FlutterMap(
               mapController: cntrl.mapController,
               options: MapOptions(
-                  initialCenter: cntrl.userLocation.value,
-                  initialZoom: 16.0,
-                  minZoom: 10.0),
-              children: [
+                initialCenter: location,
+                initialZoom: 16.0,
+                minZoom: 10.0,
+              ),
+              children: const [
                 MapTileLayer(),
                 MapPoligonLayer(),
                 MapMarkerLayer(),
                 MapCenterLocation(),
                 MapBottomSheet(),
+                StoreDetailCard(),
               ],
             ),
           ],

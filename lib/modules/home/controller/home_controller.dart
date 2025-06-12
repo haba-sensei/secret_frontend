@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
@@ -47,14 +46,9 @@ class HomeController extends GetxController {
         errorMessage.value = 'Permiso de ubicación denegado';
         return;
       }
-
-      // Obtiene ubicación actual
       currentLocation = await _locationService.getLocation();
       final lat0 = currentLocation!.latitude!;
       final lon0 = currentLocation!.longitude!;
-      _logger.i('Ubicación actual: $lat0, $lon0');
-
-      // Carga y procesa los sliders
       await _loadSliders(lat0, lon0);
     } catch (e) {
       errorMessage.value = 'Error obteniendo ubicación: $e';
@@ -78,9 +72,9 @@ class HomeController extends GetxController {
             final lat = double.tryParse(parts[0]);
             final lon = double.tryParse(parts[1]);
             if (lat != null && lon != null) {
-              final d = _calculateDistance(lat0, lon0, lat, lon);
+              final d = calculateDistance(lat0, lon0, lat, lon);
               store.distance = d;
-              store.estimatedTime = _estimateTime(d);
+              store.estimatedTime = estimateTime(d);
             }
           }
         }
@@ -99,28 +93,6 @@ class HomeController extends GetxController {
       errorMessage.value = 'Error cargando sliders: $e';
     }
   }
-
-  String _estimateTime(double distanceKm) {
-    const avgSpeedKmPerMin = 0.06;
-    final minutes = (distanceKm / avgSpeedKmPerMin).round();
-    return '$minutes min';
-  }
-
-  double _calculateDistance(
-      double lat1, double lon1, double lat2, double lon2) {
-    const earthRadius = 6371.0;
-    final dLat = _deg2rad(lat2 - lat1);
-    final dLon = _deg2rad(lon2 - lon1);
-    final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_deg2rad(lat1)) *
-            cos(_deg2rad(lat2)) *
-            sin(dLon / 2) *
-            sin(dLon / 2);
-    final c = 2 * atan2(sqrt(a), sqrt(1 - a));
-    return earthRadius * c;
-  }
-
-  double _deg2rad(double deg) => deg * (pi / 180);
 
   Future<void> cargarTipoServicios() async {
     try {

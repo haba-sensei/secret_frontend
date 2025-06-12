@@ -1,0 +1,235 @@
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+class StoreDetailBottomSheet extends StatefulWidget {
+  final Map<String, dynamic> store;
+
+  const StoreDetailBottomSheet({super.key, required this.store});
+
+  @override
+  State<StoreDetailBottomSheet> createState() => _StoreDetailBottomSheetState();
+}
+
+class _StoreDetailBottomSheetState extends State<StoreDetailBottomSheet> {
+  late PageController _pageController;
+  int _currentIndex = 0;
+
+  List<String> get imageUrls {
+    final images = widget.store['images'];
+    if (images is List && images.isNotEmpty) {
+      return images.map((e) => e.toString()).toList();
+    } else {
+      return [
+        'https://via.placeholder.com/400x200',
+        'https://via.placeholder.com/400x200/eeeeee',
+        'https://via.placeholder.com/400x200/dddddd',
+      ];
+    }
+  }
+
+  @override
+  void initState() {
+    _pageController = PageController();
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final store = widget.store;
+
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Carousel de imágenes
+            Stack(
+              children: [
+                SizedBox(
+                  height: 220,
+                  width: double.infinity,
+                  child: PageView.builder(
+                    controller: _pageController,
+                    itemCount: imageUrls.length,
+                    onPageChanged: (index) {
+                      setState(() => _currentIndex = index);
+                    },
+                    itemBuilder: (_, index) {
+                      return Image.network(
+                        imageUrls[index],
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                      );
+                    },
+                  ),
+                ),
+                // Botón de back
+                Positioned(
+                  top: 8,
+                  left: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Colors.white),
+                    onPressed: () => Get.back(),
+                  ),
+                ),
+                // Botón de like
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.favorite_border, color: Colors.white),
+                    onPressed: () {},
+                  ),
+                ),
+                // Indicadores
+                Positioned(
+                  bottom: 8,
+                  left: 0,
+                  right: 0,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(imageUrls.length, (index) {
+                      return Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: _currentIndex == index ? 10 : 6,
+                        height: _currentIndex == index ? 10 : 6,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentIndex == index ? Colors.white : Colors.white54,
+                        ),
+                      );
+                    }),
+                  ),
+                )
+              ],
+            ),
+
+            // Contenido scrollable
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Nombre + rating
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            store['name'] ?? 'Nombre desconocido',
+                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const Icon(Icons.star, color: Colors.orange),
+                        const SizedBox(width: 4),
+                        Text('${store['out_rating'] ?? 4.2}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+
+                    // Dirección
+                    Row(
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 16, color: Colors.grey),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            store['location'] ?? '123 Main Street, Anytown, California, 12345',
+                            style: const TextStyle(color: Colors.grey),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Horario
+                    Row(
+                      children: const [
+                        Icon(Icons.access_time, size: 16, color: Colors.grey),
+                        SizedBox(width: 4),
+                        Text('10:00 AM - 6:00 PM / Mon - Sat', style: TextStyle(color: Colors.grey)),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Botones de acción
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _actionButton(Icons.share, 'Compartir'),
+                        _actionButton(Icons.map, 'Dirección'),
+                        _actionButton(Icons.message, 'Mensaje'),
+                        _actionButton(Icons.phone, 'Teléfono'),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Acerca de
+                    const Text(
+                      'Acerca de',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Nuestro salón es un destino ideal para todas tus necesidades de belleza. Entra a nuestro espacio elegante donde nuestro equipo de profesionales altamente calificados se dedica a brindarte una experiencia excepcional.',
+                      style: TextStyle(color: Colors.black87),
+                    ),
+                    const SizedBox(height: 10),
+
+                    // Tabs simulados
+                    _buildTabs(),
+
+                    const SizedBox(height: 10),
+
+                    // Chips o categorías
+                    Wrap(
+                      spacing: 8,
+                      children: const [
+                        Chip(label: Text('Haircut'), backgroundColor: Colors.purpleAccent),
+                        Chip(label: Text('Makeup')),
+                        Chip(label: Text('Spa')),
+                        Chip(label: Text('Nails')),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _actionButton(IconData icon, String label) {
+    return Column(
+      children: [
+        CircleAvatar(
+          radius: 22,
+          backgroundColor: Colors.grey.shade200,
+          child: Icon(icon, size: 20, color: Colors.black87),
+        ),
+        const SizedBox(height: 4),
+        Text(label, style: const TextStyle(fontSize: 12)),
+      ],
+    );
+  }
+
+  Widget _buildTabs() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: const [
+        Text('Servicios', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
+        Text('Comodidades', style: TextStyle(color: Colors.grey)),
+        Text('Especialista', style: TextStyle(color: Colors.grey)),
+        Text('Galería', style: TextStyle(color: Colors.grey)),
+      ],
+    );
+  }
+}
